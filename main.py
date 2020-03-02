@@ -1,10 +1,17 @@
-# Import the required module for text
-# to speech conversion
 from gtts import gTTS
 from moviepy.editor import *
 import random
+import tweepy
+import time
 
-# The text that you want to convert to audio
+interval = 3000
+
+auth = tweepy.OAuthHandler('hNQpCKH5fawQ2KCsPnwl96DxV', 'FJ5NmJtIf8BVRytu8rmhp25J6kcCv5Y5HLqnYD486LlMsUzY1s')
+auth.set_access_token('1222360680478773249-IJ3en0Wqpthqknca9uAeZi7u6nl7pL',
+                      'a4T77brXH2HDuf6X4u9PHR9QYFGhNpX42oGnylpcH5EU6')
+
+api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+# food list
 food = ["Angelica", "Savoy cabbage", "Silver linden", "Kiwi", "Allium (Onion)", "Garden onion", "Leek", "Garlic",
         "Chives", "Lemon verbena", "Cashew nut", "Pineapple", "Dill", "Custard apple", "Wild celery", "Peanut",
         "Burdock", "Horseradish", "Tarragon", "Mugwort", "Asparagus", "Oat", "Star fruit", "Brazil nut",
@@ -139,29 +146,34 @@ food = ["Angelica", "Savoy cabbage", "Silver linden", "Kiwi", "Allium (Onion)", 
         "Italian sweet red pepper", "Yellow wax bean", "Green bean", "Saskatoon berry", "Nanking cherry",
         "Japanese pumpkin", "White cabbage"]
 
+while True:
+    # randomly picking the food
 
-# Passing the text and language to the engine,
-# here we have marked slow=False. Which tells
-# the module that the converted audio should
-# have a high speed
+    foodPicker = random.choice(food)
 
-foodPicker = random.choice(food)
-print(food)
+    # passing the text to the engine, setting language and norma speed
 
-foodAudio = gTTS(text=foodPicker, lang='en', slow=False)
+    foodAudio = gTTS(text=foodPicker, lang='en', slow=False)
 
-# Saving the converted audio
+    # Saving the converted audio
 
-foodAudio.save("audio/text2speech.mp3")
+    foodAudio.save("audio/text2speech.mp3")
 
-# importing the audio and getting the audio all mashed up
-text2speech = AudioFileClip("audio/text2speech.mp3")
-videoclip = VideoFileClip("original_video/original_cut.mp4")
-editedAudio = videoclip.audio
+    # deleting the item from the list to avoid duplication
+    food.remove(foodPicker)
 
-# playing the original audio then the text
-compiledAudio = CompositeAudioClip([editedAudio.set_duration(3.8), text2speech.set_start(3.8)])
+    # importing the audio and getting the audio all mashed up
+    text2speech = AudioFileClip("audio/text2speech.mp3")
+    videoclip = VideoFileClip("original_video/original_cut.mp4")
+    editedAudio = videoclip.audio
 
-videoclip.audio = compiledAudio
+    # splicing the original audio with the text2speech
+    compiledAudio = CompositeAudioClip([editedAudio.set_duration(3.8), text2speech.set_start(3.8)])
+    videoclip.audio = compiledAudio
 
-videoclip.write_videofile("edited_video/edited.mp4")
+    # saving the completed video fie
+    videoclip.write_videofile("edited_video/edited.mp4",audio_codec='aac')
+
+    upload_result = api.media_upload("edited_video/edited.mp4")
+    api.update_status(status="test tweet", media_ids=[upload_result.media_id_string])
+    time.sleep(interval)
