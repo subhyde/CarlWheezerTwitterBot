@@ -6,9 +6,8 @@ import time
 
 interval = 60 * 60 * 24
 
-auth = tweepy.OAuthHandler('hNQpCKH5fawQ2KCsPnwl96DxV', 'FJ5NmJtIf8BVRytu8rmhp25J6kcCv5Y5HLqnYD486LlMsUzY1s')
-auth.set_access_token('1222360680478773249-IJ3en0Wqpthqknca9uAeZi7u6nl7pL',
-                      'a4T77brXH2HDuf6X4u9PHR9QYFGhNpX42oGnylpcH5EU6')
+auth = tweepy.OAuthHandler('','')
+auth.set_access_token('','')
 
 api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 # food list
@@ -175,5 +174,5 @@ while True:
     videoclip.write_videofile("edited_video/edited.mp4",audio_codec='aac')
 
     upload_result = api.media_upload("edited_video/edited.mp4")
-    api.update_status(status="test tweet", media_ids=[upload_result.media_id_string])
+    api.update_status( media_ids=[upload_result.media_id_string])
     time.sleep(interval)
